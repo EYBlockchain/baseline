@@ -1,0 +1,146 @@
+version: '3.5'
+
+services:
+  zkp-recipient:
+    container_name: zkp-recipient
+    build:
+      context: ./zkp/
+      dockerfile: dev.Dockerfile
+    command: npm run dev
+    volumes:
+      - ./zkp/circuits:/app/circuits:delegated
+      - ./zkp/src:/app/src:delegated
+      - ./zkp/dist:/app/dist:delegated
+      - ./zkp/output:/app/output:delegated
+    environment:
+      PROVING_SCHEME: 'gm17'
+      VIRTUAL_HOST: radish34-zkp-recipient.docker
+      MONGO_URL: mongodb://mongo-recipient:27217 
+      MONGO_DB_NAME: 'radish34'
+      MONGO_CONNECTION_RETRIES: 5
+    depends_on:
+      - mongo-recipient
+    networks:
+      - network-recipient
+    ports:
+      - 8081:80
+
+  api-recipient:
+    container_name: api-recipient
+    build:
+      context: ./api/
+      dockerfile: dev.Dockerfile
+    command: npm run dev
+    restart: on-failure
+    volumes:
+      - ./api/src:/app/src:delegated
+      - ./api/dist:/app/dist:delegated
+      - ./api/package.json:/app/package.json:delegated
+      - ./config/keystore/recipient.eth:/keystore/account.eth
+      - ./config/config-recipient.json:/app/config/default.json
+      - ./contracts/artifacts:/app/artifacts:delegated
+    depends_on:
+      - mongo-recipient
+      - messenger-recipient
+      - redis-recipient
+    environment:
+      VIRTUAL_HOST: radish34-api-recipient.docker
+      MONGO_URL: mongodb://mongo-recipient
+      MONGO_DB_NAME: 'radish34'
+      MONGO_CONNECTION_RETRIES: 5
+      MESSENGER_URI: http://messenger-recipient:4001
+      REDIS_URL: redis://redis-recipient:6379
+      ZKP_URL: http://localhost:8081
+      MERKLE_TREE_URL: http://172.28.0.103:80
+    networks:
+      network-geth:
+      network-recipient:
+      network-connect:
+        ipv4_address: 172.28.0.102
+    ports:
+      - 8002:8001
+      - 8102:8101
+
+  mongo-recipient:
+    image: mongo:latest
+    container_name: mongo-recipient
+    volumes:
+      - mongo-recipient:/data/db
+    logging:
+      options:
+        max-size: 10m
+    networks:
+      - network-recipient
+    ports:
+      - 27217:27017
+
+  geth-recipient:
+    hostname: geth-recipient
+    container_name: geth-recipient
+    env_file:
+      - ./geth-env/miner/miner_2.env
+    ports:
+      - 8549:8545
+      - 8550:8546
+    networks:
+      - network-geth
+      - network-recipient
+    external_links: 
+      - geth-bootnode:geth-bootnode
+    build:
+      context: ./geth-env
+      dockerfile: ./miner/Dockerfile
+      args:
+        privatekey: bc5b578e0dcb2dbf98dd6e5fe62cb5a28b84a55e15fc112d4ca88e1f62bd7c35
+        password: word
+
+  redis-recipient:
+    image: redis
+    container_name: redis-recipient
+    networks:
+      - network-recipient
+    ports:
+      - 6380:6379
+
+  messenger-recipient:
+    hostname: messenger-recipient
+    container_name: messenger-recipient
+    links:
+      - mongo-recipient
+      - redis-recipient
+      - geth-recipient
+    env_file:
+      - ./messenger/docker.env
+    build:
+      context: ./messenger
+      dockerfile: ./Dockerfile
+    environment:
+      VIRTUAL_HOST: messenger-recipient
+      MONGO_URL: mongodb://mongo-recipient:27017/radish34
+      RADISH_API_URL: http://localhost:8102
+      REDIS_URL: redis://redis-recipient:6379
+      USER_INDEX: 1
+    networks:
+      network-recipient:
+      network-connect:
+        ipv4_address: 172.28.0.101
+    ports:
+     - 4002:4001
+
+volumes:
+  mongo-recipient:
+
+networks:
+  network-recipient:
+  network-geth:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.25.0.0/24
+  network-connect:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.28.0.0/24
+
+

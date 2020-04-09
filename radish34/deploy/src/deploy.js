@@ -151,19 +151,16 @@ const main = async () => {
   await deployContracts('deployer');
   await assignManager('deployer');
   await setInterfaceImplementer('deployer');
-  await register('buyer');
-  await register('supplier1');
-  await register('supplier2');
-  await registerInterfaces('buyer');
+  await register('sender');
+  await register('recipient');
+  await registerInterfaces('sender');
 
   await checkOrgCount();
-  await checkOrgInfo('buyer');
-  await checkOrgInfo('supplier1');
-  await checkOrgInfo('supplier2');
+  await checkOrgInfo('sender');
+  await checkOrgInfo('recipient');
 
-  await saveSettings('buyer');
-  await saveSettings('supplier1');
-  await saveSettings('supplier2');
+  await saveSettings('sender');
+  await saveSettings('recipient');
 
   await uploadVks('deployer');
 

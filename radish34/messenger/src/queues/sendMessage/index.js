@@ -10,7 +10,7 @@ let sendMessageReqQueue;
 let sendMessageResQueue;
 
 try {
-  sendMessageReqQueue = new Queue(requestNamespace, Config.users[0].redisUrl);
+  sendMessageReqQueue = new Queue(requestNamespace, Config.users[`${process.env.USER_INDEX}`].redisUrl);
   logger.debug(`SUCCESS: connected to bull queue "${requestNamespace}" at ${Config.users[0].redisUrl}`);
   sendMessageResQueue = new Queue(responseNamespace, Config.users[0].redisUrl);
   logger.debug(`SUCCESS: connected to bull queue "${responseNamespace}" at ${Config.users[0].redisUrl}`);

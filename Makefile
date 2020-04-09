@@ -98,3 +98,25 @@ zk-circuits:
 	mkdir -p ./zkp/output && \
 	npm run setup-circuits && \
 	popd
+
+single-setup:
+	pushd ${radish34} && \
+	docker-compose -f docker-compose.sender.yml build && \
+	docker-compose -f docker-compose.recipient.yml build && \
+	popd
+
+single-up:
+	pushd ${radish34} && \
+	docker-compose -f docker-compose.recipient.yml up -d && \
+	docker-compose -f docker-compose.sender.yml up -d && \
+	popd
+
+single-down:
+	pushd ${radish34} && \
+	docker-compose -f docker-compose.sender.yml down --remove-orphans && \
+	docker-compose -f docker-compose.recipient.yml down --remove-orphans && \
+	docker-compose -f docker-compose.sender.yml kill && \
+	docker-compose -f docker-compose.recipient.yml kill && \
+	docker network prune -f && docker volume prune -f && \
+	docker system prune -f && \
+	popd

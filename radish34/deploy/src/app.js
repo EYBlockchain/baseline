@@ -6,19 +6,17 @@ const ethers = require('./utils/ethers');
 // const getSupplier2Settings = () => Settings.getServerSettings('supplier2');
 
 const main = async () => {
-  const buyerSettings = await Settings.getServerSettings('buyer');
-  const supplier1Settings = await Settings.getServerSettings('supplier1');
-  const supplier2Settings = await Settings.getServerSettings('supplier2');
+  const senderSettings = await Settings.getServerSettings('sender');
+  const recipientSettings = await Settings.getServerSettings('recipient');
+  // const supplier2Settings = await Settings.getServerSettings('supplier2');
 
   await ethers.getProvider(process.env.RPC_PROVIDER);
 
   if (
-    !buyerSettings.addresses.OrgRegistry ||
-    !buyerSettings.addresses.ERC1820Registry ||
-    !supplier1Settings.addresses.OrgRegistry ||
-    !supplier1Settings.addresses.ERC1820Registry ||
-    !supplier2Settings.addresses.OrgRegistry ||
-    !supplier2Settings.addresses.ERC1820Registry
+    !senderSettings.addresses.OrgRegistry ||
+    !senderSettings.addresses.ERC1820Registry ||
+    !recipientSettings.addresses.OrgRegistry ||
+    !recipientSettings.addresses.ERC1820Registry
   ) {
     console.log(`
 

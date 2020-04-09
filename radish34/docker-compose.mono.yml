@@ -246,7 +246,7 @@ services:
       - ./geth-env/node/docker.env
     build:
       context: ./geth-env
-      dockerfile: ./node/Dockerfile
+      dockerfile: ./node/dev.Dockerfile
       args:
         privatekey: 54c68a6104df07a9661b9b8fe1106263feeeddfd67aed8dafed1438040e421d1
         password: word

@@ -7,7 +7,15 @@ module.exports = {
   },
   users: [
     {
-      ipAddress: 'geth-node',
+      ipAddress: 'geth-sender',
+      messengerPort: '8546',
+      apiPort: '4001',
+      origin: 'mychat2',
+      dbUrl: process.env.MONGO_URL || 'mongodb://mongo-radish:27017/radish34',
+      redisUrl: process.env.REDIS_URL || 'redis://redis-radish:6379',
+    },
+    {
+      ipAddress: 'geth-recipient',
       messengerPort: '8546',
       apiPort: '4001',
       origin: 'mychat2',
