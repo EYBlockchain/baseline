@@ -10,13 +10,8 @@ jest.setTimeout(600000);
 const buyerApiURL = 'http://localhost:8101';
 const buyerMessengerURL = 'http://localhost:4001';
 const buyerMongoURL = 'mongodb://localhost:27117/radish34'
-<<<<<<< HEAD
-const supplierMessengerURL = 'http://localhost:4003';
-const supplierApiURL = 'http://localhost:8003';
-=======
 const supplierMessengerURL = 'http://localhost:4002';
 const supplierApiURL = 'http://localhost:8102';
->>>>>>> initial commit for separate docker compose files
 
 let nativeClient;
 let db;
